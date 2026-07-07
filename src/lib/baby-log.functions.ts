@@ -260,7 +260,7 @@ export const createChart = createServerFn({ method: "POST" })
     const nextOrder = (max?.sort_order ?? -1) + 1;
     const { data: row, error } = await supabase
       .from("insight_charts")
-      .insert({ ...data, user_id: userId, sort_order: nextOrder })
+      .insert({ ...data, user_id: userId, sort_order: nextOrder } as never)
       .select("*")
       .single();
     if (error) throw new Error(error.message);
