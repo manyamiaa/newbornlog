@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
       { title: "Baby Log — Track feeds, sleep & diapers" },
       { name: "description", content: "A calm, mobile-first tracker for feedings, sleep, diapers and every little thing your new baby does." },
-      { name: "theme-color", content: "#fef3c7" },
+      { name: "theme-color", content: "#f4ecd8" },
       { property: "og:title", content: "Baby Log — Track feeds, sleep & diapers" },
       { property: "og:description", content: "A calm, mobile-first tracker for feedings, sleep, diapers and every little thing your new baby does." },
       { property: "og:type", content: "website" },

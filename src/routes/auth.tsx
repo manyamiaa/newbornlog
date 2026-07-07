@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Baby } from "lucide-react";
+import { JungleDecor } from "@/components/JungleDecor";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -69,25 +70,26 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-amber-50 to-rose-50 dark:from-slate-950 dark:to-slate-900">
-      <Card className="w-full max-w-sm p-6 space-y-5">
+    <div className="relative min-h-screen flex items-center justify-center px-4 bg-jungle">
+      <JungleDecor />
+      <Card className="relative w-full max-w-sm p-7 space-y-5 rounded-3xl border-border/60 shadow-leaf backdrop-blur-sm bg-card/85">
         <div className="flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-leaf">
             <Baby className="w-6 h-6" />
           </div>
-          <h1 className="text-xl font-semibold">Baby Log</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Baby Log</h1>
           <p className="text-sm text-muted-foreground text-center">
-            Track feeds, sleep, diapers and more.
+            A calm little place to track feeds, sleep &amp; diapers.
           </p>
         </div>
 
-        <Button variant="outline" className="w-full" onClick={handleGoogle}>
+        <Button variant="outline" className="w-full rounded-xl" onClick={handleGoogle}>
           Continue with Google
         </Button>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t" />
+            <div className="w-full border-t border-border/60" />
           </div>
           <div className="relative flex justify-center text-xs">
             <span className="bg-card px-2 text-muted-foreground">or</span>
@@ -97,13 +99,13 @@ function AuthPage() {
         <form onSubmit={handleEmail} className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl" />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full rounded-xl" disabled={loading}>
             {loading ? "..." : mode === "signup" ? "Create account" : "Sign in"}
           </Button>
         </form>

@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { JungleDecor } from "@/components/JungleDecor";
 
 const NAV = [
   { to: "/" as const, label: "Home", icon: Home },
@@ -24,25 +25,26 @@ export function AppShell({ title, children, right }: { title?: string; children:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 to-rose-50/40 dark:from-slate-950 dark:to-slate-900">
-      <header className="sticky top-0 z-30 backdrop-blur bg-background/80 border-b">
-        <div className="max-w-2xl mx-auto flex items-center gap-2 px-4 h-14">
+    <div className="relative min-h-screen bg-jungle">
+      <JungleDecor />
+      <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border/60">
+        <div className="max-w-2xl mx-auto flex items-center gap-2 px-4 h-16">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Menu">
+              <Button variant="ghost" size="icon" aria-label="Menu" className="rounded-xl">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <SheetHeader className="p-4 border-b">
+            <SheetContent side="left" className="w-72 p-0 bg-jungle">
+              <SheetHeader className="p-4 border-b border-border/60">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-leaf">
                     <Baby className="w-4 h-4" />
                   </div>
-                  Baby Log
+                  <span className="font-semibold tracking-tight">Baby Log</span>
                 </SheetTitle>
               </SheetHeader>
-              <nav className="p-2">
+              <nav className="p-3 space-y-1">
                 {NAV.map((item) => {
                   const active = pathname === item.to;
                   const Icon = item.icon;
@@ -52,8 +54,10 @@ export function AppShell({ title, children, right }: { title?: string; children:
                       to={item.to}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium",
-                        active ? "bg-primary/10 text-primary" : "hover:bg-muted",
+                        "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors",
+                        active
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground/80 hover:bg-secondary/60",
                       )}
                     >
                       <Icon className="w-4 h-4" />
@@ -63,7 +67,7 @@ export function AppShell({ title, children, right }: { title?: string; children:
                 })}
                 <button
                   onClick={signOut}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-muted text-muted-foreground"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium hover:bg-secondary/60 text-muted-foreground"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign out
@@ -71,11 +75,16 @@ export function AppShell({ title, children, right }: { title?: string; children:
               </nav>
             </SheetContent>
           </Sheet>
-          <h1 className="text-base font-semibold flex-1 truncate">{title ?? "Baby Log"}</h1>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-primary/90 text-primary-foreground flex items-center justify-center shadow-leaf shrink-0">
+              <Baby className="w-4 h-4" />
+            </div>
+            <h1 className="text-base font-semibold tracking-tight truncate">{title ?? "Baby Log"}</h1>
+          </div>
           {right}
         </div>
       </header>
-      <main className="max-w-2xl mx-auto px-4 pb-24 pt-4">{children}</main>
+      <main className="relative max-w-2xl mx-auto px-4 pb-24 pt-6">{children}</main>
     </div>
   );
 }
