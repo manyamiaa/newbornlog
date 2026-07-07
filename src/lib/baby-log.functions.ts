@@ -33,7 +33,7 @@ export const listActivities = createServerFn({ method: "GET" })
       const seed = DEFAULT_ACTIVITIES.map((a) => ({ ...a, user_id: userId }));
       const { data: inserted, error: seedErr } = await supabase
         .from("activities")
-        .insert(seed)
+        .insert(seed as never)
         .select("*");
       if (seedErr) throw new Error(seedErr.message);
       return (inserted ?? []) as unknown as Activity[];
