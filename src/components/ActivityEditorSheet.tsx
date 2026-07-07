@@ -108,6 +108,19 @@ export function ActivityEditorSheet({
   const removeField = (i: number) =>
     setDraft((d) => ({ ...d, fields: d.fields.filter((_, idx) => idx !== i) }));
 
+  const dragIndex = useRef<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
+
+  const reorderFields = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0) return;
+    setDraft((d) => {
+      const next = d.fields.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return { ...d, fields: next };
+    });
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[92vh] overflow-y-auto">
