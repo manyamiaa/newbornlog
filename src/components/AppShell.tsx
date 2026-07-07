@@ -76,9 +76,9 @@ export function AppShell({ title, children, right }: { title?: string; children:
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-primary/90 text-primary-foreground flex items-center justify-center shadow-leaf shrink-0">
+            <Link to="/" className="w-8 h-8 rounded-xl bg-primary/90 text-primary-foreground flex items-center justify-center shadow-leaf shrink-0 hover:bg-primary transition-colors">
               <Baby className="w-4 h-4" />
-            </div>
+            </Link>
             <h1 className="text-base font-semibold tracking-tight truncate">{title ?? "Baby Log"}</h1>
           </div>
           {right}
