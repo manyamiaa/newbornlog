@@ -124,41 +124,33 @@ function HomePage() {
             View all days <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
-        <Card className="divide-y">
-          {logs.length === 0 && (
-            <div className="p-6 text-center text-sm text-muted-foreground">
-              No logs yet today. Tap an activity above to start.
-            </div>
-          )}
-          {logs.map((log) => {
-            const act = activityById.get(log.activity_id);
-            if (!act) return null;
-            return (
-              <button
-                key={log.id}
-                onClick={() => setDetail({ open: true, log })}
-                className="w-full flex items-center gap-3 p-3 text-left hover:bg-muted/40 transition-colors"
-              >
-                <span
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0"
-                  style={{ backgroundColor: act.color }}
-                >
-                  <ActivityIcon name={act.icon} className="w-4 h-4" />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm">{act.name}</div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {summarize(log, act)}
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground shrink-0">
-                  {format(new Date(log.started_at), "p")}
-                </div>
-              </button>
-            );
+        <div className="mb-2">
+          <Select value={filterId} onValueChange={setFilterId}>
+            <SelectTrigger className="h-9 text-sm">
+              <SelectValue placeholder="All activities" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All activities</SelectItem>
+              {visible.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <TimeGrid
+          logs={logs.filter((l) => {
+            const a = activityById.get(l.activity_id);
+            if (!a || !a.visible) return false;
+            if (filterId !== "all" && a.id !== filterId) return false;
+            return true;
           })}
-        </Card>
+          activityById={activityById}
+          onSelect={(log) => setDetail({ open: true, log })}
+        />
       </section>
+
 
       <LogSheet
         activity={logSheet.activity}
