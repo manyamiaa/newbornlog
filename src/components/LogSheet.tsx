@@ -16,6 +16,18 @@ import { toast } from "sonner";
 
 type Values = Record<string, string | number | null>;
 
+// Format a Date as the "yyyy-MM-ddTHH:mm" string that <input type="datetime-local"> expects,
+// using the user's local timezone.
+function toLocalInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fromLocalInput(s: string): string {
+  // Interpreted as local time, converted to ISO for the server.
+  return new Date(s).toISOString();
+}
+
 export function LogSheet({
   activity,
   open,
@@ -28,12 +40,16 @@ export function LogSheet({
   editLog?: LogEntry | null;
 }) {
   const [values, setValues] = useState<Values>({});
+  const [time, setTime] = useState<string>(() => toLocalInput(new Date()));
   const qc = useQueryClient();
   const create = useServerFn(createLog);
   const update = useServerFn(updateLog);
 
   useEffect(() => {
-    if (open) setValues(editLog?.values ?? {});
+    if (open) {
+      setValues(editLog?.values ?? {});
+      setTime(toLocalInput(editLog ? new Date(editLog.started_at) : new Date()));
+    }
   }, [open, editLog]);
 
   if (!activity) return null;
@@ -45,14 +61,16 @@ export function LogSheet({
 
   const saveInstant = async () => {
     try {
+      const started_at = fromLocalInput(time);
       if (editLog) {
-        await update({ data: { id: editLog.id, patch: { values } } });
+        await update({ data: { id: editLog.id, patch: { values, started_at } } });
       } else {
         await create({
           data: {
             activity_id: activity.id,
             kind: activity.kind,
             values,
+            started_at,
           },
         });
       }
@@ -72,6 +90,7 @@ export function LogSheet({
           kind: "timed",
           values,
           start_timer: true,
+          started_at: fromLocalInput(time),
         },
       });
       toast.success(`${activity.name} timer started`);
@@ -97,6 +116,25 @@ export function LogSheet({
           </SheetTitle>
         </SheetHeader>
         <div className="space-y-4 py-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="log-time">Time</Label>
+              <button
+                type="button"
+                onClick={() => setTime(toLocalInput(new Date()))}
+                className="text-xs text-primary hover:underline"
+              >
+                Now
+              </button>
+            </div>
+            <Input
+              id="log-time"
+              type="datetime-local"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="rounded-xl"
+            />
+          </div>
           {activity.fields.map((f) => (
             <FieldInput
               key={f.key}
@@ -105,9 +143,6 @@ export function LogSheet({
               onChange={(v) => setValues((s) => ({ ...s, [f.key]: v }))}
             />
           ))}
-          {activity.fields.length === 0 && (
-            <p className="text-sm text-muted-foreground">No fields — just tap save.</p>
-          )}
         </div>
         <div className="flex gap-2 pb-4">
           {activity.kind === "instant" || editLog ? (
