@@ -139,7 +139,7 @@ export function LogSheet({
             kind: "timed",
             values,
             start_timer: true,
-            started_at: fromLocalInput(time),
+            started_at: new Date().toISOString(),
           },
         });
         toast.success(`${activity.name} timer started`);
