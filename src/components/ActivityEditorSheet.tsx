@@ -11,8 +11,7 @@ import { Plus, Trash2, GripVertical } from "lucide-react";
 import type { Activity, ActivityField, ActivityKind } from "@/lib/baby-log-types";
 import { ICON_CHOICES, COLOR_CHOICES } from "@/lib/baby-log-types";
 import { ActivityIcon } from "./ActivityIcon";
-import { createActivity, updateActivity, deleteActivity } from "@/lib/baby-log.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useDataClient } from "@/lib/data-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
