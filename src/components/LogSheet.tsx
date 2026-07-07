@@ -120,7 +120,7 @@ export function LogSheet({
         // Duration override: log a completed entry ending at the chosen "Time".
         const endedAt = new Date(fromLocalInput(time));
         const startedAt = new Date(endedAt.getTime() - mins * 60000);
-        await create({
+        const created = await create({
           data: {
             activity_id: activity.id,
             kind: "timed",
@@ -128,9 +128,9 @@ export function LogSheet({
             started_at: startedAt.toISOString(),
           },
         });
-        // createLog sets ended_at = started_at when not start_timer; patch to real end.
-        // Simpler: use update after create — but createLog returns the row.
-        // Instead: adjust via a follow-up update.
+        await update({
+          data: { id: created.id, patch: { ended_at: endedAt.toISOString() } },
+        });
         toast.success(`${activity.name} logged`);
       } else {
         await create({
