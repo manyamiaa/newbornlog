@@ -43,7 +43,48 @@ const SUGGESTIONS: Suggestion[] = [
   { title: "Sleep minutes per day (14d)", activityName: "Sleep", metric: "total_duration_min", timeframe_days: 14, chart_type: "area" },
   { title: "Diapers per day (7d)", activityName: "Diaper", metric: "count", timeframe_days: 7, chart_type: "bar" },
   { title: "Avg hours between feeds (7d)", activityName: "Feeding", metric: "gap_hours", timeframe_days: 7, chart_type: "line" },
+  { title: "Avg feed size (14d)", activityName: "Feeding", metric: "avg_field", field_key: "amount", timeframe_days: 14, chart_type: "bar" },
+  { title: "Avg sleep length (14d)", activityName: "Sleep", metric: "avg_duration_min", timeframe_days: 14, chart_type: "line" },
+  { title: "Sleep sessions per day (7d)", activityName: "Sleep", metric: "count", timeframe_days: 7, chart_type: "bar" },
+  { title: "Avg hours between diapers (7d)", activityName: "Diaper", metric: "gap_hours", timeframe_days: 7, chart_type: "line" },
+  { title: "Diapers per day (14d)", activityName: "Diaper", metric: "count", timeframe_days: 14, chart_type: "area" },
+  { title: "Pumping minutes per day (14d)", activityName: "Pumping", metric: "total_duration_min", timeframe_days: 14, chart_type: "bar" },
+  { title: "Total pumped ounces per day (14d)", activityName: "Pumping", metric: "sum_field", field_key: "amount", timeframe_days: 14, chart_type: "line" },
+  { title: "Tummy time minutes per day (7d)", activityName: "Tummy time", metric: "total_duration_min", timeframe_days: 7, chart_type: "area" },
+  { title: "Feedings per day (7d)", activityName: "Feeding", metric: "count", timeframe_days: 7, chart_type: "line" },
 ];
+
+const SUGGESTIONS_VISIBLE = 5;
+
+function SuggestedRow({
+  suggestions,
+  existingTitles,
+  onAdd,
+}: {
+  suggestions: Suggestion[];
+  existingTitles: Set<string>;
+  onAdd: (s: Suggestion) => void;
+}) {
+  const remaining = suggestions.filter((s) => !existingTitles.has(s.title)).slice(0, SUGGESTIONS_VISIBLE);
+  if (remaining.length === 0) return null;
+  return (
+    <section className="mb-6">
+      <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-1">Suggested</h2>
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+        {remaining.map((s) => (
+          <button
+            key={s.title}
+            onClick={() => onAdd(s)}
+            className="shrink-0 rounded-xl border bg-card px-3 py-2 text-xs text-left hover:bg-muted"
+          >
+            <div className="font-medium mb-0.5">+ {s.title}</div>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 
 function InsightsPage() {
   const qc = useQueryClient();
