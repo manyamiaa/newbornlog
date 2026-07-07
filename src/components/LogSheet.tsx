@@ -41,6 +41,7 @@ export function LogSheet({
 }) {
   const [values, setValues] = useState<Values>({});
   const [time, setTime] = useState<string>(() => toLocalInput(new Date()));
+  const [durationMin, setDurationMin] = useState<string>("");
   const qc = useQueryClient();
   const create = useServerFn(createLog);
   const update = useServerFn(updateLog);
@@ -49,8 +50,21 @@ export function LogSheet({
     if (open) {
       setValues(editLog?.values ?? {});
       setTime(toLocalInput(editLog ? new Date(editLog.started_at) : new Date()));
+      if (editLog && editLog.ended_at && activity?.kind === "timed") {
+        const mins = Math.max(
+          0,
+          Math.round(
+            (new Date(editLog.ended_at).getTime() -
+              new Date(editLog.started_at).getTime()) /
+              60000,
+          ),
+        );
+        setDurationMin(String(mins));
+      } else {
+        setDurationMin("");
+      }
     }
-  }, [open, editLog]);
+  }, [open, editLog, activity?.kind]);
 
   if (!activity) return null;
 
