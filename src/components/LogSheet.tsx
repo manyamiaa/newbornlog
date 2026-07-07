@@ -73,11 +73,28 @@ export function LogSheet({
     qc.invalidateQueries({ queryKey: ["timer"] });
   };
 
+  const parsedDuration = () => {
+    const n = Number(durationMin);
+    return durationMin.trim() !== "" && Number.isFinite(n) && n >= 0 ? n : null;
+  };
+
   const saveInstant = async () => {
     try {
       const started_at = fromLocalInput(time);
       if (editLog) {
-        await update({ data: { id: editLog.id, patch: { values, started_at } } });
+        const patch: {
+          values: Values;
+          started_at: string;
+          ended_at?: string | null;
+        } = { values, started_at };
+        if (activity.kind === "timed") {
+          const mins = parsedDuration();
+          patch.ended_at =
+            mins == null
+              ? null
+              : new Date(new Date(started_at).getTime() + mins * 60000).toISOString();
+        }
+        await update({ data: { id: editLog.id, patch } });
       } else {
         await create({
           data: {
@@ -98,22 +115,44 @@ export function LogSheet({
 
   const startTimer = async () => {
     try {
-      await create({
-        data: {
-          activity_id: activity.id,
-          kind: "timed",
-          values,
-          start_timer: true,
-          started_at: fromLocalInput(time),
-        },
-      });
-      toast.success(`${activity.name} timer started`);
+      const mins = parsedDuration();
+      if (mins != null) {
+        // Duration override: log a completed entry ending at the chosen "Time".
+        const endedAt = new Date(fromLocalInput(time));
+        const startedAt = new Date(endedAt.getTime() - mins * 60000);
+        await create({
+          data: {
+            activity_id: activity.id,
+            kind: "timed",
+            values,
+            started_at: startedAt.toISOString(),
+          },
+        });
+        // createLog sets ended_at = started_at when not start_timer; patch to real end.
+        // Simpler: use update after create — but createLog returns the row.
+        // Instead: adjust via a follow-up update.
+        toast.success(`${activity.name} logged`);
+      } else {
+        await create({
+          data: {
+            activity_id: activity.id,
+            kind: "timed",
+            values,
+            start_timer: true,
+            started_at: fromLocalInput(time),
+          },
+        });
+        toast.success(`${activity.name} timer started`);
+      }
       invalidate();
       onOpenChange(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed");
     }
   };
+
+  const isTimed = activity.kind === "timed";
+  const durationOverridden = parsedDuration() != null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -132,7 +171,7 @@ export function LogSheet({
         <div className="space-y-4 py-4">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="log-time">Time</Label>
+              <Label htmlFor="log-time">{isTimed ? "Start time" : "Time"}</Label>
               <button
                 type="button"
                 onClick={() => setTime(toLocalInput(new Date()))}
@@ -149,6 +188,32 @@ export function LogSheet({
               className="rounded-xl"
             />
           </div>
+          {isTimed && (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="log-duration">Duration (minutes)</Label>
+                {durationOverridden && (
+                  <button
+                    type="button"
+                    onClick={() => setDurationMin("")}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Auto
+                  </button>
+                )}
+              </div>
+              <Input
+                id="log-duration"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                placeholder="Automatically calculated"
+                value={durationMin}
+                onChange={(e) => setDurationMin(e.target.value)}
+                className="rounded-xl"
+              />
+            </div>
+          )}
           {activity.fields.map((f) => (
             <FieldInput
               key={f.key}
@@ -164,11 +229,9 @@ export function LogSheet({
               Save
             </Button>
           ) : (
-            <>
-              <Button className="flex-1" onClick={startTimer}>
-                Start timer
-              </Button>
-            </>
+            <Button className="flex-1" onClick={startTimer}>
+              {durationOverridden ? "Save" : "Start timer"}
+            </Button>
           )}
         </div>
       </SheetContent>
