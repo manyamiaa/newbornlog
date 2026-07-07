@@ -138,7 +138,7 @@ export const createLog = createServerFn({ method: "POST" })
         started_at: startedAt,
         ended_at: endedAt,
         values: data.values,
-      })
+      } as never)
       .select("*")
       .single();
     if (error) throw new Error(error.message);
