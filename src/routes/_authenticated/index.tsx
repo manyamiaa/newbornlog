@@ -59,6 +59,7 @@ function HomePage() {
   });
   const [editor, setEditor] = useState<{ open: boolean; activity: Activity | null }>({ open: false, activity: null });
   const [detail, setDetail] = useState<{ open: boolean; log: LogEntry | null }>({ open: false, log: null });
+  const [filterId, setFilterId] = useState<string>("all");
 
   const visible = activities.filter((a) => a.visible);
   const activityById = new Map(activities.map((a) => [a.id, a]));
