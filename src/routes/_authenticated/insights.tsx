@@ -108,20 +108,12 @@ function InsightsPage() {
         </Sheet>
       }
     >
-      <section className="mb-6">
-        <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-1">Suggested</h2>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s.title}
-              onClick={() => addSuggestion(s)}
-              className="shrink-0 rounded-xl border bg-card px-3 py-2 text-xs text-left hover:bg-muted"
-            >
-              <div className="font-medium mb-0.5">+ {s.title}</div>
-            </button>
-          ))}
-        </div>
-      </section>
+      <SuggestedRow
+        suggestions={SUGGESTIONS}
+        existingTitles={new Set(charts.map((c) => c.title))}
+        onAdd={addSuggestion}
+      />
+
 
       <section className="space-y-4">
         {charts.length === 0 && (
