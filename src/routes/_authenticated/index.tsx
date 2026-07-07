@@ -14,6 +14,13 @@ import { Card } from "@/components/ui/card";
 import { format, startOfDay, endOfDay, differenceInSeconds } from "date-fns";
 import { Square, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
