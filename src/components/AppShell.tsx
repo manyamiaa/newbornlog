@@ -1,11 +1,25 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
-import { Menu, Baby, Calendar as CalIcon, LineChart, ListChecks, LogOut, Home } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Menu, Baby, Calendar as CalIcon, LineChart, ListChecks, LogOut, Home, Heart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { JungleDecor } from "@/components/JungleDecor";
+import { getProfile, updateBabyName } from "@/lib/profile.functions";
+import { toast } from "sonner";
 
 const NAV = [
   { to: "/" as const, label: "Home", icon: Home },
@@ -18,6 +32,35 @@ export function AppShell({ title, children, right }: { title?: string; children:
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const qc = useQueryClient();
+
+  const getProfileFn = useServerFn(getProfile);
+  const updateBabyNameFn = useServerFn(updateBabyName);
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfileFn(),
+  });
+
+  const [nameOpen, setNameOpen] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+
+  useEffect(() => {
+    if (profile && !profile.baby_name) {
+      setNameOpen(true);
+    }
+  }, [profile]);
+
+  const saveName = useMutation({
+    mutationFn: (baby_name: string) => updateBabyNameFn({ data: { baby_name } }),
+    onSuccess: (row) => {
+      qc.setQueryData(["profile"], row);
+      setNameOpen(false);
+      setNameInput("");
+      toast.success("Saved");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to save"),
+  });
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -66,6 +109,17 @@ export function AppShell({ title, children, right }: { title?: string; children:
                   );
                 })}
                 <button
+                  onClick={() => {
+                    setOpen(false);
+                    setNameInput(profile?.baby_name ?? "");
+                    setNameOpen(true);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium hover:bg-secondary/60 text-foreground/80"
+                >
+                  <Heart className="w-4 h-4 text-emerald-500" fill="currentColor" />
+                  {profile?.baby_name ? "Edit baby's name" : "Set baby's name"}
+                </button>
+                <button
                   onClick={signOut}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium hover:bg-secondary/60 text-muted-foreground"
                 >
@@ -81,10 +135,65 @@ export function AppShell({ title, children, right }: { title?: string; children:
             </Link>
             <h1 className="text-base font-semibold tracking-tight truncate">{title ?? "Baby Log"}</h1>
           </div>
+          {profile?.baby_name && (
+            <button
+              type="button"
+              onClick={() => {
+                setNameInput(profile.baby_name ?? "");
+                setNameOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-secondary/60 hover:bg-secondary transition-colors text-sm font-medium max-w-[45%]"
+              aria-label="Edit baby's name"
+            >
+              <Heart className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="currentColor" />
+              <span className="truncate">{profile.baby_name}</span>
+            </button>
+          )}
           {right}
         </div>
       </header>
       <main className="relative max-w-2xl mx-auto px-4 pb-24 pt-6">{children}</main>
+
+      <Dialog open={nameOpen} onOpenChange={(v) => { if (!saveName.isPending) setNameOpen(v); }}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="w-4 h-4 text-emerald-500" fill="currentColor" />
+              {profile?.baby_name ? "Edit baby's name" : "What's your baby's name?"}
+            </DialogTitle>
+            <DialogDescription>
+              We'll show it at the top so this log feels a bit more like theirs.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = nameInput.trim();
+              if (!v) return;
+              saveName.mutate(v);
+            }}
+            className="space-y-3"
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="baby-name">Baby's name</Label>
+              <Input
+                id="baby-name"
+                autoFocus
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="e.g. Noa"
+                maxLength={60}
+                className="rounded-xl"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={saveName.isPending || !nameInput.trim()} className="rounded-xl">
+                {saveName.isPending ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

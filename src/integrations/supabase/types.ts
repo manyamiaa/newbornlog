@@ -138,6 +138,27 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          baby_name: string | null
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          baby_name?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          baby_name?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
