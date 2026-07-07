@@ -14,7 +14,130 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          color: string
+          created_at: string
+          fields: Json
+          icon: string
+          id: string
+          kind: Database["public"]["Enums"]["activity_kind"]
+          name: string
+          sort_order: number
+          user_id: string
+          visible: boolean
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          fields?: Json
+          icon?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["activity_kind"]
+          name: string
+          sort_order?: number
+          user_id: string
+          visible?: boolean
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          fields?: Json
+          icon?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["activity_kind"]
+          name?: string
+          sort_order?: number
+          user_id?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      insight_charts: {
+        Row: {
+          activity_id: string | null
+          chart_type: string
+          created_at: string
+          field_key: string | null
+          id: string
+          metric: string
+          sort_order: number
+          timeframe_days: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          activity_id?: string | null
+          chart_type?: string
+          created_at?: string
+          field_key?: string | null
+          id?: string
+          metric: string
+          sort_order?: number
+          timeframe_days?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string | null
+          chart_type?: string
+          created_at?: string
+          field_key?: string | null
+          id?: string
+          metric?: string
+          sort_order?: number
+          timeframe_days?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insight_charts_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logs: {
+        Row: {
+          activity_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          started_at: string
+          user_id: string
+          values: Json
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_id: string
+          values?: Json
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_id?: string
+          values?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +146,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      activity_kind: "instant" | "timed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +273,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_kind: ["instant", "timed"],
+    },
   },
 } as const
