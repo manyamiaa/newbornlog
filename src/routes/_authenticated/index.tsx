@@ -214,11 +214,13 @@ function TileButton({
       onPointerLeave={cancel}
       onPointerCancel={cancel}
       onContextMenu={(e) => e.preventDefault()}
-      className="aspect-square rounded-2xl flex flex-col items-center justify-center gap-2 text-white active:scale-95 transition-transform shadow-sm"
+      className="aspect-square rounded-3xl flex flex-col items-center justify-center gap-3 text-white active:scale-95 transition-transform shadow-leaf p-4"
       style={{ backgroundColor: activity.color }}
     >
-      <ActivityIcon name={activity.icon} className="w-7 h-7" />
-      <span className="text-xs font-medium text-center px-1 leading-tight">{activity.name}</span>
+      <ActivityIcon name={activity.icon} className="w-12 h-12" strokeWidth={1.75} />
+      <span className="text-sm font-semibold text-center px-1 leading-tight tracking-tight">
+        {activity.name}
+      </span>
     </button>
   );
 }

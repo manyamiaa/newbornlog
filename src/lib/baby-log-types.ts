@@ -52,35 +52,34 @@ export const DEFAULT_ACTIVITIES: Array<
   {
     name: "Feeding",
     icon: "Milk",
-    color: "#60a5fa",
+    color: "#7a9560",
     kind: "instant",
     visible: true,
     sort_order: 0,
     fields: [
       { key: "amount", label: "Amount", type: "number", unit: "oz" },
-      { key: "type", label: "Type", type: "select", options: ["Formula", "Breastmilk"] },
-      { key: "notes", label: "Notes", type: "textarea" },
-    ],
-  },
-  {
-    name: "Nursing",
-    icon: "Heart",
-    color: "#f472b6",
-    kind: "timed",
-    visible: true,
-    sort_order: 1,
-    fields: [
-      { key: "side", label: "Side", type: "select", options: ["Left", "Right", "Both"] },
+      {
+        key: "method",
+        label: "How fed",
+        type: "select",
+        options: [
+          "Bottle - Formula",
+          "Bottle - Breastmilk",
+          "Nursing - Left",
+          "Nursing - Right",
+          "Nursing - Both",
+        ],
+      },
       { key: "notes", label: "Notes", type: "textarea" },
     ],
   },
   {
     name: "Sleep",
     icon: "Moon",
-    color: "#818cf8",
+    color: "#4a6b3a",
     kind: "timed",
     visible: true,
-    sort_order: 2,
+    sort_order: 1,
     fields: [
       { key: "location", label: "Location", type: "select", options: ["Crib", "Bassinet", "Contact", "Stroller", "Car"] },
       { key: "notes", label: "Notes", type: "textarea" },
@@ -89,10 +88,10 @@ export const DEFAULT_ACTIVITIES: Array<
   {
     name: "Diaper",
     icon: "Droplet",
-    color: "#fbbf24",
+    color: "#b8863f",
     kind: "instant",
     visible: true,
-    sort_order: 3,
+    sort_order: 2,
     fields: [
       { key: "type", label: "Type", type: "select", options: ["Wet", "Dirty", "Both"] },
       { key: "notes", label: "Notes", type: "textarea" },
@@ -101,10 +100,10 @@ export const DEFAULT_ACTIVITIES: Array<
   {
     name: "Pumping",
     icon: "Beaker",
-    color: "#34d399",
+    color: "#9db08a",
     kind: "timed",
     visible: true,
-    sort_order: 4,
+    sort_order: 3,
     fields: [
       { key: "side", label: "Side", type: "select", options: ["Left", "Right", "Both"] },
       { key: "amount", label: "Amount", type: "number", unit: "oz" },
@@ -114,19 +113,19 @@ export const DEFAULT_ACTIVITIES: Array<
   {
     name: "Tummy time",
     icon: "Baby",
-    color: "#fb923c",
+    color: "#c47b52",
     kind: "timed",
     visible: true,
-    sort_order: 5,
+    sort_order: 4,
     fields: [{ key: "notes", label: "Notes", type: "textarea" }],
   },
   {
     name: "Medicine",
     icon: "Pill",
-    color: "#f87171",
+    color: "#a55a3f",
     kind: "instant",
     visible: true,
-    sort_order: 6,
+    sort_order: 5,
     fields: [
       { key: "name", label: "Name", type: "text" },
       { key: "dose", label: "Dose", type: "text" },
@@ -136,10 +135,10 @@ export const DEFAULT_ACTIVITIES: Array<
   {
     name: "Growth",
     icon: "Ruler",
-    color: "#a78bfa",
+    color: "#6b4f3a",
     kind: "instant",
     visible: true,
-    sort_order: 7,
+    sort_order: 6,
     fields: [
       { key: "weight_lb", label: "Weight (lb)", type: "number" },
       { key: "height_in", label: "Height (in)", type: "number" },
@@ -155,6 +154,7 @@ export const ICON_CHOICES = [
 ] as const;
 
 export const COLOR_CHOICES = [
-  "#60a5fa", "#f472b6", "#818cf8", "#fbbf24", "#34d399", "#fb923c",
-  "#f87171", "#a78bfa", "#4ade80", "#22d3ee", "#e879f9", "#94a3b8",
+  "#4a6b3a", "#7a9560", "#9db08a", "#b8863f", "#c47b52",
+  "#a55a3f", "#6b4f3a", "#d9b382", "#8a6d4b", "#5f7a52",
+  "#c9a66b", "#94886f",
 ] as const;
