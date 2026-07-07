@@ -92,7 +92,7 @@ export const updateActivity = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: row, error } = await supabase
       .from("activities")
-      .update(data.patch)
+      .update(data.patch as never)
       .eq("id", data.id)
       .select("*")
       .single();
