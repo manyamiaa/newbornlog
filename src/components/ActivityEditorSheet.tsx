@@ -189,9 +189,38 @@ export function ActivityEditorSheet({
               <p className="text-xs text-muted-foreground">No fields yet.</p>
             )}
             {draft.fields.map((f, i) => (
-              <div key={i} className="rounded-lg border p-3 space-y-2">
+              <div
+                key={i}
+                draggable
+                onDragStart={(e) => {
+                  dragIndex.current = i;
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (dragOver !== i) setDragOver(i);
+                }}
+                onDragLeave={() => setDragOver((v) => (v === i ? null : v))}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const from = dragIndex.current;
+                  if (from != null) reorderFields(from, i);
+                  dragIndex.current = null;
+                  setDragOver(null);
+                }}
+                onDragEnd={() => {
+                  dragIndex.current = null;
+                  setDragOver(null);
+                }}
+                className={`rounded-lg border p-3 space-y-2 bg-background ${
+                  dragOver === i ? "border-primary ring-2 ring-primary/30" : ""
+                }`}
+              >
                 <div className="flex items-center gap-2">
-                  <GripVertical className="w-4 h-4 text-muted-foreground" />
+                  <span className="cursor-grab active:cursor-grabbing touch-none" aria-label="Drag to reorder">
+                    <GripVertical className="w-4 h-4 text-muted-foreground" />
+                  </span>
                   <Input
                     placeholder="Label"
                     value={f.label}
