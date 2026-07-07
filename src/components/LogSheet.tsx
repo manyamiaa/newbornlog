@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/select";
 import type { Activity, ActivityField, LogEntry } from "@/lib/baby-log-types";
 import { ActivityIcon } from "./ActivityIcon";
-import { createLog, updateLog } from "@/lib/baby-log.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useDataClient } from "@/lib/data-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -43,8 +42,9 @@ export function LogSheet({
   const [time, setTime] = useState<string>(() => toLocalInput(new Date()));
   const [durationMin, setDurationMin] = useState<string>("");
   const qc = useQueryClient();
-  const create = useServerFn(createLog);
-  const update = useServerFn(updateLog);
+  const client = useDataClient();
+  const create = client.createLog;
+  const update = client.updateLog;
 
   useEffect(() => {
     if (open) {
@@ -69,8 +69,8 @@ export function LogSheet({
   if (!activity) return null;
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ["logs"] });
-    qc.invalidateQueries({ queryKey: ["timer"] });
+    qc.invalidateQueries({ queryKey: [client.mode, "logs"] });
+    qc.invalidateQueries({ queryKey: [client.mode, "timer"] });
   };
 
   const parsedDuration = () => {

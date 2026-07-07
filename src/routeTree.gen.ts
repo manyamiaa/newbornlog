@@ -10,8 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DemoRouteRouteImport } from './routes/demo/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as DemoInsightsRouteImport } from './routes/demo/insights'
+import { Route as DemoCalendarRouteImport } from './routes/demo/calendar'
+import { Route as DemoActivitiesRouteImport } from './routes/demo/activities'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
@@ -21,14 +26,39 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoRouteRoute = DemoRouteRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const DemoInsightsRoute = DemoInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => DemoRouteRoute,
+} as any)
+const DemoCalendarRoute = DemoCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => DemoRouteRoute,
+} as any)
+const DemoActivitiesRoute = DemoActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => DemoRouteRoute,
 } as any)
 const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
   id: '/insights',
@@ -48,44 +78,83 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '/demo': typeof DemoRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/insights': typeof AuthenticatedInsightsRoute
+  '/demo/activities': typeof DemoActivitiesRoute
+  '/demo/calendar': typeof DemoCalendarRoute
+  '/demo/insights': typeof DemoInsightsRoute
+  '/demo/': typeof DemoIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/insights': typeof AuthenticatedInsightsRoute
+  '/demo/activities': typeof DemoActivitiesRoute
+  '/demo/calendar': typeof DemoCalendarRoute
+  '/demo/insights': typeof DemoInsightsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/demo': typeof DemoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/demo': typeof DemoRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
+  '/demo/activities': typeof DemoActivitiesRoute
+  '/demo/calendar': typeof DemoCalendarRoute
+  '/demo/insights': typeof DemoInsightsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/demo/': typeof DemoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/activities' | '/calendar' | '/insights'
+  fullPaths:
+    | '/'
+    | '/demo'
+    | '/auth'
+    | '/activities'
+    | '/calendar'
+    | '/insights'
+    | '/demo/activities'
+    | '/demo/calendar'
+    | '/demo/insights'
+    | '/demo/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/activities' | '/calendar' | '/insights' | '/'
+  to:
+    | '/auth'
+    | '/activities'
+    | '/calendar'
+    | '/insights'
+    | '/demo/activities'
+    | '/demo/calendar'
+    | '/demo/insights'
+    | '/'
+    | '/demo'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/demo'
     | '/auth'
     | '/_authenticated/activities'
     | '/_authenticated/calendar'
     | '/_authenticated/insights'
+    | '/demo/activities'
+    | '/demo/calendar'
+    | '/demo/insights'
     | '/_authenticated/'
+    | '/demo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  DemoRouteRoute: typeof DemoRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
@@ -98,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -105,12 +181,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/demo/insights': {
+      id: '/demo/insights'
+      path: '/insights'
+      fullPath: '/demo/insights'
+      preLoaderRoute: typeof DemoInsightsRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/calendar': {
+      id: '/demo/calendar'
+      path: '/calendar'
+      fullPath: '/demo/calendar'
+      preLoaderRoute: typeof DemoCalendarRouteImport
+      parentRoute: typeof DemoRouteRoute
+    }
+    '/demo/activities': {
+      id: '/demo/activities'
+      path: '/activities'
+      fullPath: '/demo/activities'
+      preLoaderRoute: typeof DemoActivitiesRouteImport
+      parentRoute: typeof DemoRouteRoute
     }
     '/_authenticated/insights': {
       id: '/_authenticated/insights'
@@ -153,8 +257,27 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DemoRouteRouteChildren {
+  DemoActivitiesRoute: typeof DemoActivitiesRoute
+  DemoCalendarRoute: typeof DemoCalendarRoute
+  DemoInsightsRoute: typeof DemoInsightsRoute
+  DemoIndexRoute: typeof DemoIndexRoute
+}
+
+const DemoRouteRouteChildren: DemoRouteRouteChildren = {
+  DemoActivitiesRoute: DemoActivitiesRoute,
+  DemoCalendarRoute: DemoCalendarRoute,
+  DemoInsightsRoute: DemoInsightsRoute,
+  DemoIndexRoute: DemoIndexRoute,
+}
+
+const DemoRouteRouteWithChildren = DemoRouteRoute._addFileChildren(
+  DemoRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  DemoRouteRoute: DemoRouteRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport

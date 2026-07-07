@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import type { Activity, LogEntry } from "@/lib/baby-log-types";
 import { ActivityIcon } from "./ActivityIcon";
 import { format, differenceInMinutes } from "date-fns";
-import { deleteLog } from "@/lib/baby-log.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useDataClient } from "@/lib/data-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
@@ -23,7 +22,8 @@ export function LogDetailSheet({
   onEdit: () => void;
 }) {
   const qc = useQueryClient();
-  const del = useServerFn(deleteLog);
+  const client = useDataClient();
+  const del = client.deleteLog;
   if (!log || !activity) return null;
 
   const duration =
@@ -32,7 +32,7 @@ export function LogDetailSheet({
   const doDelete = async () => {
     try {
       await del({ data: { id: log.id } });
-      qc.invalidateQueries({ queryKey: ["logs"] });
+      qc.invalidateQueries({ queryKey: [client.mode, "logs"] });
       toast.success("Deleted");
       onOpenChange(false);
     } catch (e) {

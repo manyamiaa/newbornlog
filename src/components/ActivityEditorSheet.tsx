@@ -11,8 +11,7 @@ import { Plus, Trash2, GripVertical } from "lucide-react";
 import type { Activity, ActivityField, ActivityKind } from "@/lib/baby-log-types";
 import { ICON_CHOICES, COLOR_CHOICES } from "@/lib/baby-log-types";
 import { ActivityIcon } from "./ActivityIcon";
-import { createActivity, updateActivity, deleteActivity } from "@/lib/baby-log.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useDataClient } from "@/lib/data-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -47,9 +46,10 @@ export function ActivityEditorSheet({
 }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const qc = useQueryClient();
-  const create = useServerFn(createActivity);
-  const update = useServerFn(updateActivity);
-  const del = useServerFn(deleteActivity);
+  const client = useDataClient();
+  const create = client.createActivity;
+  const update = client.updateActivity;
+  const del = client.deleteActivity;
 
   useEffect(() => {
     if (!open) return;
@@ -66,7 +66,7 @@ export function ActivityEditorSheet({
     );
   }, [open, activity]);
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["activities"] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: [client.mode, "activities"] });
 
   const save = async () => {
     if (!draft.name.trim()) return toast.error("Name required");

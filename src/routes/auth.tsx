@@ -117,6 +117,24 @@ function AuthPage() {
         >
           {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
         </button>
+
+        <div className="relative pt-1">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border/60" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-card px-2 text-muted-foreground">just looking?</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full rounded-xl"
+          onClick={() => navigate({ to: "/demo" })}
+        >
+          See demo
+        </Button>
       </Card>
     </div>
   );

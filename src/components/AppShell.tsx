@@ -1,7 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Menu, Baby, Calendar as CalIcon, LineChart, ListChecks, LogOut, Home, Heart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -18,43 +17,43 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { JungleDecor } from "@/components/JungleDecor";
-import { getProfile, updateBabyName } from "@/lib/profile.functions";
 import { toast } from "sonner";
-
-const NAV = [
-  { to: "/" as const, label: "Home", icon: Home },
-  { to: "/calendar" as const, label: "Calendar", icon: CalIcon },
-  { to: "/insights" as const, label: "Insights", icon: LineChart },
-  { to: "/activities" as const, label: "Activities", icon: ListChecks },
-];
+import { useAppPaths, useDataClient } from "@/lib/data-client";
 
 export function AppShell({ title, children, right }: { title?: string; children: ReactNode; right?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const qc = useQueryClient();
+  const client = useDataClient();
+  const paths = useAppPaths();
 
-  const getProfileFn = useServerFn(getProfile);
-  const updateBabyNameFn = useServerFn(updateBabyName);
+  const NAV = [
+    { to: paths.home, label: "Home", icon: Home },
+    { to: paths.calendar, label: "Calendar", icon: CalIcon },
+    { to: paths.insights, label: "Insights", icon: LineChart },
+    { to: paths.activities, label: "Activities", icon: ListChecks },
+  ];
 
   const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: () => getProfileFn(),
+    queryKey: [client.mode, "profile"],
+    queryFn: () => client.getProfile(),
   });
 
   const [nameOpen, setNameOpen] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
   useEffect(() => {
-    if (profile && !profile.baby_name) {
+    // Only prompt in auth mode — the demo always ships with a baby name.
+    if (client.mode === "auth" && profile && !profile.baby_name) {
       setNameOpen(true);
     }
-  }, [profile]);
+  }, [profile, client.mode]);
 
   const saveName = useMutation({
-    mutationFn: (baby_name: string) => updateBabyNameFn({ data: { baby_name } }),
+    mutationFn: (baby_name: string) => client.updateBabyName({ data: { baby_name } }),
     onSuccess: (row) => {
-      qc.setQueryData(["profile"], row);
+      qc.setQueryData([client.mode, "profile"], row);
       setNameOpen(false);
       setNameInput("");
       toast.success("Saved");
@@ -63,14 +62,24 @@ export function AppShell({ title, children, right }: { title?: string; children:
   });
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (client.mode === "auth") {
+      await supabase.auth.signOut();
+    }
     navigate({ to: "/auth" });
   };
 
   return (
     <div className="relative min-h-screen bg-jungle">
       <JungleDecor />
-      <header className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border/60">
+      {client.mode === "demo" && (
+        <div className="sticky top-0 z-40 bg-emerald-600 text-white text-xs font-medium text-center py-1.5 px-3">
+          Demo mode — changes won't be saved.{" "}
+          <Link to="/auth" className="underline underline-offset-2">
+            Sign up to keep your data
+          </Link>
+        </div>
+      )}
+      <header className={cn("sticky z-30 backdrop-blur-md bg-background/70 border-b border-border/60", client.mode === "demo" ? "top-7" : "top-0")}>
         <div className="max-w-2xl mx-auto flex items-center gap-2 px-4 h-16">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -124,13 +133,13 @@ export function AppShell({ title, children, right }: { title?: string; children:
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium hover:bg-secondary/60 text-muted-foreground"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign out
+                  {client.mode === "demo" ? "Exit demo" : "Sign out"}
                 </button>
               </nav>
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Link to="/" className="w-8 h-8 rounded-xl bg-primary/90 text-primary-foreground flex items-center justify-center shadow-leaf shrink-0 hover:bg-primary transition-colors">
+            <Link to={paths.home} className="w-8 h-8 rounded-xl bg-primary/90 text-primary-foreground flex items-center justify-center shadow-leaf shrink-0 hover:bg-primary transition-colors">
               <Baby className="w-4 h-4" />
             </Link>
             <h1 className="text-base font-semibold tracking-tight truncate">{title ?? "Baby Log"}</h1>
