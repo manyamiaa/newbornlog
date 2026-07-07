@@ -85,6 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "A calm, mobile-first tracker for feedings, sleep, diapers and every little thing your new baby does." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Baby Log — Track feeds, sleep & diapers" },
+      { name: "twitter:description", content: "A calm, mobile-first tracker for feedings, sleep, diapers and every little thing your new baby does." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/64304bb4-4cdd-4f47-9265-68d9d315f96e/id-preview-7772c30c--d8a16259-5d4c-45b7-ba1b-9d10fb3d29aa.lovable.app-1783458146504.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/64304bb4-4cdd-4f47-9265-68d9d315f96e/id-preview-7772c30c--d8a16259-5d4c-45b7-ba1b-9d10fb3d29aa.lovable.app-1783458146504.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
