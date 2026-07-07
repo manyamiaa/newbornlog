@@ -22,7 +22,8 @@ export function LogDetailSheet({
   onEdit: () => void;
 }) {
   const qc = useQueryClient();
-  const del = useServerFn(deleteLog);
+  const client = useDataClient();
+  const del = client.deleteLog;
   if (!log || !activity) return null;
 
   const duration =
@@ -31,7 +32,7 @@ export function LogDetailSheet({
   const doDelete = async () => {
     try {
       await del({ data: { id: log.id } });
-      qc.invalidateQueries({ queryKey: ["logs"] });
+      qc.invalidateQueries({ queryKey: [client.mode, "logs"] });
       toast.success("Deleted");
       onOpenChange(false);
     } catch (e) {
