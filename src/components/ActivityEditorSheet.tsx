@@ -66,7 +66,7 @@ export function ActivityEditorSheet({
     );
   }, [open, activity]);
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["activities"] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: [client.mode, "activities"] });
 
   const save = async () => {
     if (!draft.name.trim()) return toast.error("Name required");
