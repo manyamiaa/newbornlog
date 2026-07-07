@@ -69,8 +69,8 @@ export function LogSheet({
   if (!activity) return null;
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ["logs"] });
-    qc.invalidateQueries({ queryKey: ["timer"] });
+    qc.invalidateQueries({ queryKey: [client.mode, "logs"] });
+    qc.invalidateQueries({ queryKey: [client.mode, "timer"] });
   };
 
   const parsedDuration = () => {
