@@ -290,10 +290,15 @@ function ChartCard({
   onDelete: () => void;
 }) {
   const logsFn = useServerFn(listLogs);
-  const from = startOfDay(subDays(new Date(), chart.timeframe_days - 1)).toISOString();
-  const to = new Date().toISOString();
+  const { from, to } = useMemo(() => {
+    const end = new Date();
+    return {
+      from: startOfDay(subDays(end, chart.timeframe_days - 1)).toISOString(),
+      to: end.toISOString(),
+    };
+  }, [chart.timeframe_days, chart.id]);
   const { data: logs = [] } = useQuery({
-    queryKey: ["logs", from, to, "insight", chart.id],
+    queryKey: ["logs", "insight", chart.id, from, to],
     queryFn: () => logsFn({ data: { from, to } }),
   });
 
