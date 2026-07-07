@@ -46,9 +46,10 @@ export function ActivityEditorSheet({
 }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const qc = useQueryClient();
-  const create = useServerFn(createActivity);
-  const update = useServerFn(updateActivity);
-  const del = useServerFn(deleteActivity);
+  const client = useDataClient();
+  const create = client.createActivity;
+  const update = client.updateActivity;
+  const del = client.deleteActivity;
 
   useEffect(() => {
     if (!open) return;
