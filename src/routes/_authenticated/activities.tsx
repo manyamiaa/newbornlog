@@ -46,7 +46,12 @@ function ActivitiesPage() {
     >
       <Card className="divide-y">
         {activities.map((a) => (
-          <div key={a.id} className="flex items-center gap-3 p-3">
+          <button
+            key={a.id}
+            type="button"
+            onClick={() => setEditor({ open: true, activity: a })}
+            className="w-full flex items-center gap-3 p-3 text-left hover:bg-muted/40 transition-colors"
+          >
             <span
               className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
               style={{ backgroundColor: a.color }}
@@ -54,21 +59,28 @@ function ActivitiesPage() {
               <ActivityIcon name={a.icon} className="w-5 h-5" />
             </span>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm flex items-center gap-2">
-                {a.name}
-                <Badge variant="outline" className="text-[10px]">
-                  {a.kind === "timed" ? "Timer" : "Instant"}
-                </Badge>
-              </div>
+              <div className="font-medium text-sm">{a.name}</div>
               <div className="text-xs text-muted-foreground truncate">
                 {a.fields.length === 0 ? "No fields" : a.fields.map((f) => f.label).join(", ")}
               </div>
             </div>
-            <Switch checked={a.visible} onCheckedChange={() => toggleVisible(a)} aria-label="Visible" />
-            <Button variant="ghost" size="icon" onClick={() => setEditor({ open: true, activity: a })}>
-              <Pencil className="w-4 h-4" />
-            </Button>
-          </div>
+            <div
+              className="flex items-center gap-2 shrink-0"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Badge
+                variant="secondary"
+                className="text-xs px-2.5 py-1 rounded-full font-medium"
+              >
+                {a.kind === "timed" ? "Timed" : "Instant"}
+              </Badge>
+              <Switch
+                checked={a.visible}
+                onCheckedChange={() => toggleVisible(a)}
+                aria-label="Visible"
+              />
+            </div>
+          </button>
         ))}
         {activities.length === 0 && (
           <div className="p-8 text-center text-sm text-muted-foreground">No activities yet.</div>
