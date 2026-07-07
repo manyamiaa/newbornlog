@@ -160,7 +160,7 @@ export const updateLog = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("logs")
-      .update(data.patch)
+      .update(data.patch as never)
       .eq("id", data.id)
       .select("*")
       .single();
