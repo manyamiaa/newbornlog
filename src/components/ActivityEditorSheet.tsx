@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,6 +108,19 @@ export function ActivityEditorSheet({
   const removeField = (i: number) =>
     setDraft((d) => ({ ...d, fields: d.fields.filter((_, idx) => idx !== i) }));
 
+  const dragIndex = useRef<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
+
+  const reorderFields = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0) return;
+    setDraft((d) => {
+      const next = d.fields.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return { ...d, fields: next };
+    });
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[92vh] overflow-y-auto">
@@ -176,9 +189,38 @@ export function ActivityEditorSheet({
               <p className="text-xs text-muted-foreground">No fields yet.</p>
             )}
             {draft.fields.map((f, i) => (
-              <div key={i} className="rounded-lg border p-3 space-y-2">
+              <div
+                key={i}
+                draggable
+                onDragStart={(e) => {
+                  dragIndex.current = i;
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (dragOver !== i) setDragOver(i);
+                }}
+                onDragLeave={() => setDragOver((v) => (v === i ? null : v))}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const from = dragIndex.current;
+                  if (from != null) reorderFields(from, i);
+                  dragIndex.current = null;
+                  setDragOver(null);
+                }}
+                onDragEnd={() => {
+                  dragIndex.current = null;
+                  setDragOver(null);
+                }}
+                className={`rounded-lg border p-3 space-y-2 bg-background ${
+                  dragOver === i ? "border-primary ring-2 ring-primary/30" : ""
+                }`}
+              >
                 <div className="flex items-center gap-2">
-                  <GripVertical className="w-4 h-4 text-muted-foreground" />
+                  <span className="cursor-grab active:cursor-grabbing touch-none" aria-label="Drag to reorder">
+                    <GripVertical className="w-4 h-4 text-muted-foreground" />
+                  </span>
                   <Input
                     placeholder="Label"
                     value={f.label}
