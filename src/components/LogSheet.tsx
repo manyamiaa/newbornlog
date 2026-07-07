@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/select";
 import type { Activity, ActivityField, LogEntry } from "@/lib/baby-log-types";
 import { ActivityIcon } from "./ActivityIcon";
-import { createLog, updateLog } from "@/lib/baby-log.functions";
-import { useServerFn } from "@tanstack/react-start";
+import { useDataClient } from "@/lib/data-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
