@@ -63,7 +63,7 @@ export const createActivity = createServerFn({ method: "POST" })
     const nextOrder = (max?.sort_order ?? -1) + 1;
     const { data: row, error } = await supabase
       .from("activities")
-      .insert({ ...data, user_id: userId, sort_order: nextOrder, visible: true })
+      .insert({ ...data, user_id: userId, sort_order: nextOrder, visible: true } as never)
       .select("*")
       .single();
     if (error) throw new Error(error.message);
