@@ -242,17 +242,79 @@ function LiveElapsed({ start }: { start: string }) {
 }
 const pad = (n: number) => n.toString().padStart(2, "0");
 
-function summarize(log: LogEntry, act: Activity): string {
-  const parts: string[] = [];
-  for (const f of act.fields) {
-    const v = log.values?.[f.key];
-    if (v == null || v === "" || f.type === "textarea") continue;
-    parts.push(`${v}${f.unit ? f.unit : ""}`);
-    if (parts.length >= 2) break;
-  }
-  if (act.kind === "timed" && log.ended_at) {
-    const mins = Math.round((new Date(log.ended_at).getTime() - new Date(log.started_at).getTime()) / 60000);
-    parts.push(`${mins}m`);
-  }
-  return parts.join(" · ") || "Logged";
+function TimeGrid({
+  logs,
+  activityById,
+  onSelect,
+}: {
+  logs: LogEntry[];
+  activityById: Map<string, Activity>;
+  onSelect: (log: LogEntry) => void;
+}) {
+  const HOUR_H = 48;
+  const total = 24 * HOUR_H;
+  const pos = (iso: string) => {
+    const d = new Date(iso);
+    return ((d.getHours() * 60 + d.getMinutes()) / 60) * HOUR_H;
+  };
+
+  return (
+    <Card className="relative overflow-hidden">
+      <div className="relative" style={{ height: total }}>
+        {Array.from({ length: 24 }).map((_, h) => (
+          <div
+            key={h}
+            className="absolute left-0 right-0 border-t border-border/60 flex"
+            style={{ top: h * HOUR_H }}
+          >
+            <span className="text-[10px] text-muted-foreground w-10 pl-1 -mt-1.5">
+              {h === 0 ? "" : `${h}:00`}
+            </span>
+          </div>
+        ))}
+
+        {logs.map((log) => {
+          const act = activityById.get(log.activity_id);
+          if (!act) return null;
+          const top = pos(log.started_at);
+          const isTimed = act.kind === "timed" && log.ended_at;
+          if (isTimed && log.ended_at) {
+            const bottom = pos(log.ended_at);
+            const height = Math.max(bottom - top, 16);
+            return (
+              <button
+                key={log.id}
+                onClick={() => onSelect(log)}
+                className="absolute left-12 right-2 rounded-md text-white text-xs px-2 py-1 text-left overflow-hidden shadow-sm"
+                style={{ top, height, backgroundColor: act.color }}
+              >
+                <div className="flex items-center gap-1 font-medium">
+                  <ActivityIcon name={act.icon} className="w-3 h-3" />
+                  {act.name}
+                </div>
+                <div className="text-[10px] opacity-90">
+                  {format(new Date(log.started_at), "p")} – {format(new Date(log.ended_at), "p")}
+                </div>
+              </button>
+            );
+          }
+          return (
+            <button
+              key={log.id}
+              onClick={() => onSelect(log)}
+              className="absolute left-12 flex items-center gap-1.5 text-xs text-white rounded-full px-2 py-0.5 shadow-sm"
+              style={{ top: top - 8, backgroundColor: act.color }}
+            >
+              <ActivityIcon name={act.icon} className="w-3 h-3" />
+              <span>{act.name}</span>
+              <span className="opacity-80 text-[10px]">
+                {format(new Date(log.started_at), "p")}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </Card>
+  );
 }
+
