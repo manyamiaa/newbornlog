@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Activity } from "@/lib/baby-log-types";
 
 export const Route = createFileRoute("/_authenticated/activities")({
