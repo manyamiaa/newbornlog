@@ -42,8 +42,9 @@ export function LogSheet({
   const [time, setTime] = useState<string>(() => toLocalInput(new Date()));
   const [durationMin, setDurationMin] = useState<string>("");
   const qc = useQueryClient();
-  const create = useServerFn(createLog);
-  const update = useServerFn(updateLog);
+  const client = useDataClient();
+  const create = client.createLog;
+  const update = client.updateLog;
 
   useEffect(() => {
     if (open) {
